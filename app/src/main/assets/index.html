@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>MazeMint: One Line Quest</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app-container">
+
+    <!-- TOP STATUS BAR -->
+    <header class="top-bar">
+      <div class="currency-group">
+        <div class="badge badge-coins" id="badge-coins" title="Virtual Coins">
+          <span>🪙</span>
+          <span id="header-coins">200</span>
+        </div>
+        <div class="badge badge-cash" id="badge-cash" title="Virtual Cash Balance">
+          <span>💵</span>
+          <span id="header-cash">$12.50</span>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="btn-withdraw" id="btn-withdraw" title="Demo Cashout Interface">
+          <span>💸</span> Withdraw
+        </button>
+        <button class="icon-btn" id="theme-toggle-btn" title="Toggle Light/Dark Theme">🌙</button>
+        <button class="icon-btn" id="btn-settings" title="Settings">⚙️</button>
+      </div>
+    </header>
+
+    <!-- SUB HEADER (LEVEL & METRICS) -->
+    <section class="sub-header">
+      <div class="level-info">
+        <div class="level-title-row">
+          <span class="level-name" id="current-level-title">Level 1: First Slither</span>
+          <div class="stars-rating" id="sub-header-stars">
+            <span class="star-item star-empty">☆</span>
+            <span class="star-item star-empty">☆</span>
+            <span class="star-item star-empty">☆</span>
+          </div>
+        </div>
+        <div class="level-meta-row">
+          <span class="meta-item" id="current-category-name">Simple Mazes</span>
+          <span>•</span>
+          <span class="meta-item">⏱️ <span id="timer-display">00:00</span></span>
+          <span>•</span>
+          <span class="meta-item">🐍 <span id="moves-count">0</span> / <span id="optimal-moves">4</span> Escaped</span>
+        </div>
+      </div>
+      <div class="sub-buttons">
+        <button class="pill-btn" id="btn-level-select">🗺️ Levels</button>
+        <button class="pill-btn" id="btn-daily-challenge">📅 Daily</button>
+        <button class="pill-btn" id="btn-achievements">🏆</button>
+      </div>
+    </section>
+
+    <!-- INTERACTIVE MAZE CANVAS AREA -->
+    <main class="maze-container">
+      <div id="app-toast" class="canvas-toast">Notice</div>
+      <canvas id="maze-canvas"></canvas>
+    </main>
+
+    <!-- GAMEPLAY CONTROLS -->
+    <section class="game-controls">
+      <button class="ctrl-btn" id="ctrl-undo" title="Undo Last Slither">
+        <span>↩️</span> Undo
+      </button>
+      <button class="ctrl-btn" id="ctrl-reset" title="Restart Level">
+        <span>🔄</span> Reset
+      </button>
+      <button class="ctrl-btn" id="ctrl-pause" title="Pause Game">
+        <span>⏸️</span> Pause
+      </button>
+      <button class="ctrl-btn" id="btn-help" title="Rules & Tutorial">
+        <span>❓</span> How to Play
+      </button>
+    </section>
+
+    <!-- POWER-UP TOOLS BAR -->
+    <footer class="tools-bar">
+      <div class="tool-item" id="tool-hint" title="Highlight Free Arrow">
+        <span class="tool-icon">💡</span>
+        <span class="tool-name">Hint</span>
+        <span class="tool-count" id="tool-count-hint">3</span>
+      </div>
+      <div class="tool-item" id="tool-eraser" title="Undo Last Slithered Snake">
+        <span class="tool-icon">🧹</span>
+        <span class="tool-name">Rewind</span>
+        <span class="tool-count" id="tool-count-eraser">5</span>
+      </div>
+      <div class="tool-item" id="tool-star" title="Auto Slither Next Snake">
+        <span class="tool-icon">⭐</span>
+        <span class="tool-name">Star Slither</span>
+        <span class="tool-count" id="tool-count-star">2</span>
+      </div>
+      <div class="tool-item" id="tool-ruler" title="Laser Collision Trajectory Guide">
+        <span class="tool-icon">📏</span>
+        <span class="tool-name">Guide</span>
+        <span class="tool-count" id="tool-count-ruler">3</span>
+      </div>
+    </footer>
+
+    <!-- BOTTOM AD BANNER PLACEHOLDER -->
+    <aside class="ad-banner-container" id="ad-banner" title="Click to view AdMob Integration Guidance">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="ad-badge">Ad</span>
+        <div class="ad-info">
+          <span class="ad-title">Test Ad - Google AdMob Banner</span>
+          <span class="ad-unit">ca-app-pub-3940256099942544/6300978111</span>
+        </div>
+      </div>
+      <span class="ad-action">Guidance ⓘ</span>
+    </aside>
+
+    <!-- MODAL: LEVEL COMPLETE -->
+    <div class="modal-overlay" id="modal-win">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title">🎉 Maze Cleared!</div>
+        </div>
+        <div class="modal-body" style="text-align:center;">
+          <h3 id="win-level-name" style="font-size:20px; font-weight:800; color:var(--text-primary); margin-top:4px;">Level 1 Cleared!</h3>
+          <div class="win-stars" id="win-stars">
+            <span>⭐</span><span>⭐</span><span>⭐</span>
+          </div>
+          <div class="rewards-grid">
+            <div class="reward-card reward-coins">
+              <div style="font-size:12px; font-weight:700; color:var(--text-secondary);">Coins Earned</div>
+              <div class="reward-value" id="win-coins-val">+60</div>
+            </div>
+            <div class="reward-card reward-cash">
+              <div style="font-size:12px; font-weight:700; color:var(--text-secondary);">Virtual Cash</div>
+              <div class="reward-value" id="win-cash-val">+$0.30</div>
+            </div>
+          </div>
+          <p id="win-stats-val" style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">All snakes escaped!</p>
+          <div style="display:flex; gap:10px;">
+            <button class="btn-secondary btn-block" id="btn-win-replay">🔄 Replay</button>
+            <button class="btn-primary btn-block" id="btn-win-next">Next Level ➔</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: LEVEL SELECTOR -->
+    <div class="modal-overlay" id="modal-levels">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title">🗺️ Select Level (1-100)</div>
+          <button class="modal-close">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="category-tabs">
+            <button class="category-tab active" data-category="all">All (1-100)</button>
+            <button class="category-tab" data-category="simple">Simple (1-20)</button>
+            <button class="category-tab" data-category="arrows">Arrows (21-50)</button>
+            <button class="category-tab" data-category="geometric">Geometric (51-75)</button>
+            <button class="category-tab" data-category="challenge">Master (76-100)</button>
+          </div>
+          <div class="levels-grid" id="levels-grid-container"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: DEMO WITHDRAWAL SCREEN -->
+    <div class="modal-overlay" id="modal-withdraw">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title">💸 Virtual Cashout (Demo)</div>
+          <button class="modal-close">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="demo-banner">
+            <div class="demo-banner-title">⚠️ Demo — No Real Payments</div>
+            <div class="demo-banner-desc">
+              All displayed funds are <strong>virtual game play currency</strong> with no real monetary value. This demo simulator demonstrates game economy and reward quest logic.
+            </div>
+          </div>
+
+          <div class="balance-progress-box">
+            <div class="progress-header">
+              <span>Demo Payout Threshold</span>
+              <span id="withdraw-progress-text">$12.50 / $100.00 (13%)</span>
+            </div>
+            <div class="progress-bar-track">
+              <div class="progress-bar-fill" id="withdraw-progress-fill" style="width: 13%;"></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:12px;">
+              <span>Current Balance: <strong id="withdraw-current-balance" style="color:var(--cash-green);">$12.50</strong></span>
+              <span>Min Cashout: <strong>$100.00</strong></span>
+            </div>
+          </div>
+
+          <label class="form-label">Select Demo Payout Method</label>
+          <div class="payment-methods-grid">
+            <div class="payment-method-card selected">
+              <span>🅿️</span> PayPal (Demo)
+            </div>
+            <div class="payment-method-card">
+              <span>💵</span> Cash App (Demo)
+            </div>
+            <div class="payment-method-card">
+              <span>🎁</span> Google Play Card
+            </div>
+            <div class="payment-method-card">
+              <span>📦</span> Amazon Gift Card
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Demo Account Email / Tag</label>
+            <input type="text" class="form-input" id="withdraw-account-input" placeholder="player@example.com / $cashtag" value="player@mazemint.demo">
+          </div>
+
+          <button class="btn-success btn-block" id="btn-submit-withdraw">
+            Request Demo Cashout ($100.00)
+          </button>
+
+          <div style="margin-top:16px;">
+            <div class="form-label">Recent Virtual Ledger History</div>
+            <div id="withdraw-tx-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: SETTINGS -->
+    <div class="modal-overlay" id="modal-settings">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title">⚙️ Settings</div>
+          <button class="modal-close">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="settings-list">
+            <div class="setting-item">
+              <div class="setting-info">
+                <span class="setting-label">Sound Effects</span>
+                <span class="setting-desc">Web Audio slithers, fanfares & bonks</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="setting-sound" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <span class="setting-label">Vibration & Haptics</span>
+                <span class="setting-desc">Haptic feedback for slithers & bumps</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="setting-haptics" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <span class="setting-label">Classic Navy Style</span>
+                <span class="setting-desc">Toggle between candy colors and classic sleek navy</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="setting-classic">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-item" style="border-bottom:none;">
+              <div class="setting-info">
+                <span class="setting-label">Reset Game Data</span>
+                <span class="setting-desc">Clear local level progress and coins</span>
+              </div>
+              <button class="btn-secondary" id="btn-reset-data" style="color:var(--danger-red); border-color:var(--danger-red); padding:6px 12px; font-size:12px;">Reset</button>
+            </div>
+          </div>
+          <div style="margin-top:20px; font-size:11px; color:var(--text-muted); text-align:center;">
+            MazeMint: One Line Quest • System ID: MM-OLQ-2026-001<br>
+            Arrow Snake Escape Mechanic • 100 Solvable Levels
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: PAUSE -->
+    <div class="modal-overlay" id="modal-pause">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title">⏸️ Game Paused</div>
+          <button class="modal-close">✕</button>
+        </div>
+        <div class="modal-body" style="text-align:center;">
+          <p style="color:var(--text-secondary); margin-bottom:16px;">Take a breather! Your timer is paused.</p>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <button class="btn-primary btn-block btn-modal-dismiss">Resume Quest</button>
+            <button class="btn-secondary btn-block" onclick="location.reload()">Restart Level</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: TUTORIAL & HELP -->
+    <div class="modal-overlay" id="modal-tutorial">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title">📖 How To Play (নিয়মাবলী)</div>
+          <button class="modal-close">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="tutorial-step">
+            <div class="tutorial-num">1</div>
+            <div class="tutorial-content">
+              <h4>তীরের মাথায় ক্লিক করুন (Tap the Arrow Head)</h4>
+              <p>প্রতিটি সাপের মাথায় একটি তীর (Arrow) আছে। তীরের মাথায় ক্লিক করলে সে তীরের অভিমুখে <strong>সাপের মতো পিছলে (Slither)</strong> মেজ থেকে বের হয়ে যাবে।</p>
+            </div>
+          </div>
+          <div class="tutorial-step">
+            <div class="tutorial-num">2</div>
+            <div class="tutorial-content">
+              <h4>বাধা মুক্ত পথ খুঁজুন (Clear Path First)</h4>
+              <p>যদি তীরের সামনে অন্য কোনো সাপ থাকে, তবে সে বের হতে পারবে না এবং <strong>ধাক্কা খাবে (Bump)</strong>। আগে সামনের সাপটিকে মুক্ত করতে হবে!</p>
+            </div>
+          </div>
+          <div class="tutorial-step">
+            <div class="tutorial-num">3</div>
+            <div class="tutorial-content">
+              <h4>সম্পূর্ণ গোলকধাঁধা সমাধান (Untangle All)</h4>
+              <p>সঠিক ক্রমানুসারে একের পর এক মুক্ত তীর ক্লিক করে সবগুলোকে মেজ থেকে বের করে দিন। সবগুলো সাপ মুক্ত হলে লেভেল সম্পন্ন হবে!</p>
+            </div>
+          </div>
+          <div class="tutorial-step">
+            <div class="tutorial-num">4</div>
+            <div class="tutorial-content">
+              <h4>পাওয়ার টুলস ব্যবহার করুন (Power-Up Tools)</h4>
+              <p>আটকে গেলে <strong>💡 Hint</strong> ব্যবহার করে মুক্ত তীরটি দেখতে পাবেন, <strong>⭐ Star Slither</strong> সরাসরি সাপ বের করবে, এবং <strong>📏 Guide</strong> ধাক্কা খাওয়ার লেজার লাইন দেখাবে।</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-primary btn-modal-dismiss">খেলতে শুরু করুন (Let's Play)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: ACHIEVEMENTS -->
+    <div class="modal-overlay" id="modal-achievements">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title">🏆 Quest Achievements</div>
+          <button class="modal-close">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="achievements-list" id="achievements-container"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: DAILY CHALLENGE -->
+    <div class="modal-overlay" id="modal-daily">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title">📅 Daily Quest</div>
+          <button class="modal-close">✕</button>
+        </div>
+        <div class="modal-body" style="text-align:center;">
+          <div style="font-size:38px; margin:8px 0;">🌟</div>
+          <h3 style="font-size:18px; font-weight:800; color:var(--text-primary);">Special Daily Arrow Maze</h3>
+          <p style="font-size:12px; color:var(--text-secondary); margin:6px 0 14px;">Complete today's exclusive puzzle to earn <strong>2x Virtual Cash & Golden Coins</strong>!</p>
+          <div style="background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:10px; margin-bottom:14px; font-size:12px;">
+            Current Daily Streak: <strong id="daily-streak-val" style="color:var(--primary-blue);">1 Day</strong>
+          </div>
+          <button class="btn-primary btn-block" id="btn-play-daily">Play Daily Challenge</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: ADMOB GUIDANCE & TEST AD UNITS -->
+    <div class="modal-overlay" id="modal-admob">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title">📢 Google AdMob Guidance</div>
+          <button class="modal-close">✕</button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:12px; color:var(--text-secondary); line-height:1.5;">
+            Official Google AdMob sample test unit IDs for Android integration:
+          </p>
+          <div class="code-box">
+// Official Google AdMob Test Ad Units
+App ID: ca-app-pub-3940256099942544~3347511713
+Banner: ca-app-pub-3940256099942544/6300978111
+Interstitial: ca-app-pub-3940256099942544/1033173712
+Rewarded: ca-app-pub-3940256099942544/5224354917
+          </div>
+          <h4 style="font-size:13px; font-weight:800; margin-top:10px;">Play Policy Compliance Guidelines:</h4>
+          <ul style="font-size:11px; color:var(--text-secondary); line-height:1.5; padding-left:16px; margin-top:4px;">
+            <li>Never show ads while player is actively tapping or watching slither animations.</li>
+            <li>Display interstitial ads only at natural level transitions.</li>
+            <li>Provide clear close countdown for interstitials.</li>
+            <li>Use rewarded video for optional tool refills (e.g. +3 Hints).</li>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-primary btn-modal-dismiss">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FULLSCREEN INTERSTITIAL AD SIMULATOR -->
+    <div id="ad-interstitial-overlay">
+      <div class="ad-interstitial-top">
+        <span class="ad-badge" style="background:#EF4444;">Test Interstitial Ad</span>
+        <button class="ad-interstitial-close" id="ad-close-btn">Close Ad ✕</button>
+      </div>
+      <div class="ad-interstitial-content">
+        <h2>AdMob Test Interstitial</h2>
+        <p style="font-size:13px; color:#94A3B8;">Unit: ca-app-pub-3940256099942544/1033173712</p>
+        <p id="ad-countdown" style="margin-top:14px; font-size:14px; font-weight:700; color:#38BDF8;">Ad closing in 3s...</p>
+      </div>
+      <div style="font-size:10px; color:#64748B; text-align:center;">
+        Simulation only • Compliant with Google Play ad placement policies
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/audio.js"></script>
+  <script src="js/levels.js"></script>
+  <script src="js/maze.js"></script>
+  <script src="js/admob_simulator.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

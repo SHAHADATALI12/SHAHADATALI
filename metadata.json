@@ -1,0 +1,6 @@
+{
+  "name": "MazeMint: One Line Quest",
+  "description": "A colourful, crisp mobile-first one-line maze puzzle game with directional arrow paths, power-up tools, 100 levels, and virtual rewards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
